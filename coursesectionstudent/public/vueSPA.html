@@ -1,74 +1,62 @@
 <html>
 <head>
-    <title>A very simple SPA in Vue</title>
+    <title>A very simple SPA in Vue and Axios</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script
-            src="https://code.jquery.com/jquery-3.3.1.js"
-            integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-            crossorigin="anonymous"></script>
 </head>
 <body>
 
 <div id="Itemlist">
-    <button v-on:click="doajax('courses')">courses</button>
-    <button v-on:click="doajax('sections')">sections</button>
-    <button v-on:click="doajax('students')">students</button>
+    <button v-on:click="students_selected=false">courses</button>
+    <button v-on:click="students_selected=true">students</button>
     <ul>
-        <!--
-        <div v-for="item in items">
-            <li>{{item.name}}</li>
+    <span v-if="students_selected">
+        <p>Students</p>
+        <div v-for="student in students">
+            <li>{{student.name}}</li>
         </div>
-        -->
-
-        <table id="firstTable">
+    </span>
+        <span v-else>
+        <!--<div v-for="course in courses">
+            <li>{{advisor.name}}</li>
+            <div v-for="student in students">
+                <span v-if="student.advisor_id === advisor.id">
+                    {{ student.name }}
+                </span>
+            </div>
+            -->
+            <table id="courseTable">
             <thead>
             <tr>
                 <th>Name</th>
                 <th>Credits</th>
-                <th>Semester</th>
-                <th>Number</th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="item in items">
-                <td>{{item.name}}</td>
-                <td>{{item.credits}}</td>
-                <td>{{item.semester}}</td>
-                <td>{{item. number}}</td>
+            <tr v-for="course in courses">
+                <td>{{course.name}}</td>
+                <td>{{course.credits}}</td>
             </tr>
             </tbody>
         </table>
-        <!--
-            <div v-for="item in items">
-                <li>{{ item.name }}</li>
-                <li>{{ item.credits }}</li>
-                <li>{{ item.semester }}</li>
-                <li>{{ item.number }}</li>
-            </div>
-            -->
+        </div>
+    </span>
     </ul>
 </div>
 
 <script type="text/javascript">
     var ItemsVue = new Vue({
         el: '#Itemlist',
-        data: { items: [], var: current = '' },
-        methods: {
-            // use jquery
-            doajax: function(which) {
-                $.ajax({
-                    url: 'http://localhost:3000/' + which + '.json',
-                    method: 'GET',
-                    // use => so the this is not set
-                    success: (d) => {
-                        this.items = d;
-                        this.current = which;
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            }
+        data: { students: [],
+            students_selected: true,
+            courses: [] },
+        mounted: function() {
+            axios.get('http://localhost:3000/students.json')
+                .then(response => { this.students = response.data })
+                .catch(error => { console.log(error); });
+            axios.get('http://localhost:3000/courses.json')
+                .then(response => { this.courses = response.data })
+                .catch(error => { console.log(error); });
         }
     });
 </script>
