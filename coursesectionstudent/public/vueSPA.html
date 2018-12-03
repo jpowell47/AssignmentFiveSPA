@@ -1,74 +1,91 @@
 <html>
 <head>
     <title>A very simple SPA in Vue</title>
+    <!--
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script
             src="https://code.jquery.com/jquery-3.3.1.js"
             integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
             crossorigin="anonymous"></script>
+            -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
 <body>
 
 <div id="Itemlist">
-    <button v-on:click="doajax('courses')">courses</button>
-    <button v-on:click="doajax('sections')">sections</button>
-    <button v-on:click="doajax('students')">students</button>
+    <button v-on:click="which_selected='courses'">courses</button>
+    <button v-on:click="which_selected='sections'">sections</button>
+    <button v-on:click="which_selected='students'">students</button>
     <ul>
-        <!--
-        <div v-for="item in items">
-            <li>{{item.name}}</li>
-        </div>
-        -->
-
-        <table id="firstTable">
+     <span v-if="which_selected==='courses'">
+        <table id="courseTable">
             <thead>
             <tr>
                 <th>Name</th>
                 <th>Credits</th>
-                <th>Semester</th>
-                <th>Number</th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="item in items">
-                <td>{{item.name}}</td>
-                <td>{{item.credits}}</td>
-                <td>{{item.semester}}</td>
-                <td>{{item. number}}</td>
+            <tr v-for="course in courses">
+                <td>{{course.name}}</td>
+                <td>{{course.credits}}</td>
             </tr>
             </tbody>
         </table>
-        <!--
-            <div v-for="item in items">
-                <li>{{ item.name }}</li>
-                <li>{{ item.credits }}</li>
-                <li>{{ item.semester }}</li>
-                <li>{{ item.number }}</li>
-            </div>
-            -->
+        </span>
+        <span v-else-if="which_selected==='sections'">
+            <table id="sectionTable">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Number</th>
+                <th>Semester</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="section in sections">
+                <td>{{courses[section.id].name}}</td>
+                <td>{{section.number}}</td>
+                <td>{{section.semester}}</td>
+            </tr>
+            </tbody>
+        </table>
+        </span>
+        <span v-else-if="which_selected==='students'">
+            <table id="studentTable">
+            <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="student in students">
+                <td>{{student.name}}</td>
+            </tr>
+            </tbody>
+        </table>
+        </span>
+        <span v-else=>
+            <p>Testing</p>
+        </span>
     </ul>
 </div>
 
 <script type="text/javascript">
     var ItemsVue = new Vue({
         el: '#Itemlist',
-        data: { items: [], var: current = '' },
-        methods: {
-            // use jquery
-            doajax: function(which) {
-                $.ajax({
-                    url: 'http://localhost:3000/' + which + '.json',
-                    method: 'GET',
-                    // use => so the this is not set
-                    success: (d) => {
-                        this.items = d;
-                        this.current = which;
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            }
+        data: { courses: [], sections: [], students: [], which_selected:'' },
+        mounted: function() {
+            axios.get('http://localhost:3000/students.json')
+                .then(response => { this.students = response.data })
+                .catch(error => { console.log(error); });
+            axios.get('http://localhost:3000/courses.json')
+                .then(response => { this.courses = response.data })
+                .catch(error => { console.log(error); });
+            axios.get('http://localhost:3000/sections.json')
+                .then(response => { this.sections = response.data })
+                .catch(error => { console.log(error); });
         }
     });
 </script>
