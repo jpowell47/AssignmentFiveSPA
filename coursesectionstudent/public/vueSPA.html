@@ -38,7 +38,7 @@
             </thead>
             <tbody>
             <tr v-for="section in sections">
-                <td>{{courses[section.id].name}}</td>
+                <td>{{courses[section.course_id - 1].name}}</td>
                 <td>{{section.number}}</td>
                 <td>{{section.semester}}</td>
             </tr>
